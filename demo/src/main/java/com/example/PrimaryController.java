@@ -9,4 +9,9 @@ public class PrimaryController {
     private void switchToSecondary() throws IOException {
         App.setRoot("secondary");
     }
+    
+    @FXML
+    public void switchToGame() throws IOException {
+        App.setRoot("tetris");
+    }
 }
