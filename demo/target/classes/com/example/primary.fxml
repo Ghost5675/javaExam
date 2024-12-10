@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.PrimaryController">
-   <children>
-      <Label text="Primary View" />
-      <Button fx:id="primaryButton" text="Switch to Secondary View" onAction="#switchToSecondary"/>
-      <Button text="Play Tetris" onAction="#switchToGame"/>
-   </children>
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
-</VBox>
+<AnchorPane prefHeight="293.0" prefWidth="400.0" style="-fx-background-color: #f7f7f7;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.PrimaryController">
+    <children>
+        <VBox alignment="CENTER" layoutX="50.0" layoutY="30.0" prefWidth="300" spacing="15">
+            <!-- Заголовок -->
+            <Label fx:id="display" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;" text="Registration" />
+            
+            <!-- Поля ввода -->
+            <VBox spacing="10">
+                <TextField fx:id="nameField" promptText="Enter name" style="-fx-font-size: 14px;" />
+                <TextField fx:id="emailField" promptText="Enter email" style="-fx-font-size: 14px;" />
+                <PasswordField fx:id="passwordField" promptText="Enter password" style="-fx-font-size: 14px;" />
+            </VBox>
+            
+            <!-- Кнопки -->
+            <HBox alignment="CENTER" spacing="15">
+                <Button onAction="#sign" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="sign up" />
+            </HBox>
+         <HBox alignment="CENTER" spacing="15">
+            <children>
+               <Label text="already have an account?" />
+               <Button onAction="#logIn" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="log in" />
+            </children>
+         </HBox>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="213.0" prefWidth="400.0" style="-fx-background-color: #f7f7f7;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.FifthController">
+    <children>
+        <VBox alignment="CENTER" layoutX="50.0" layoutY="30.0" prefWidth="300" spacing="15">
+            <!-- Заголовок -->
+            <Label fx:id="display" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;" text="enter new password" />
+            
+            <!-- Поля ввода -->
+            <VBox spacing="10">
+            <PasswordField fx:id="passwordField" promptText="Enter new password" />
+            <PasswordField fx:id="confirmField" promptText="confirm new password" />
+            </VBox>
+            
+            <!-- Кнопки -->
+            <HBox alignment="CENTER" spacing="15">
+                <Button onAction="#confirm" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="confirm" />
+            </HBox>
+         <HBox alignment="CENTER" spacing="15" />
+        </VBox>
+    </children>
+</AnchorPane>
