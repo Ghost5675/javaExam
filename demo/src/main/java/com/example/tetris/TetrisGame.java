@@ -9,10 +9,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
@@ -61,6 +61,18 @@ public class TetrisGame extends Application {
 			Arrays.fill(a, 0);
 		}
 
+		for (int i = 0; i < XMAX; i += MOVE) {
+			Line line = new Line(i, 0, i, YMAX);
+			line.setStroke(Color.WHITE);
+			group.getChildren().addAll(line);
+		}
+
+		for (int i = 0; i <= YMAX; i += MOVE) {
+			Line line = new Line(0, i, XMAX, i);
+			line.setStroke(Color.WHITE);
+			group.getChildren().addAll(line);
+		}
+
 		Line line = new Line(XMAX, 0, XMAX, YMAX);
 
 		Text scoretext = new Text("Score: ");
@@ -76,6 +88,8 @@ public class TetrisGame extends Application {
 		level.setFill(Color.GREEN);
 
 		group.getChildren().addAll(scoretext, line, level);
+
+		group.setStyle("-fx-background-color: BLACK");
 
 		FormFigure a = nextObj;
 		group.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -165,51 +179,349 @@ public class TetrisGame extends Application {
 
 		switch (form.getName()) {
 			case "j":
-				if (f == 1 && cB(a, 1, -1) && cB(c, -1, -1) && cB(d, -2, -2)) {
-					MoveRight(form.a);
-					MoveDown(form.a);
-					MoveDown(form.c);
-					MoveLeft(form.c);
-					MoveDown(form.d);
-					MoveDown(form.d);
-					MoveLeft(form.d);
-					MoveLeft(form.d);
+				if (f == 1 && cB(a, 2, -1) && cB(b, 1, -2) && cB(c, 0, -1) && cB(d, -1, 0)) {
+					MoveRight(a);
+					MoveRight(a);
+					MoveUp(a);
+
+					MoveRight(b);
+					MoveUp(b);
+					MoveUp(b);
+					MoveUp(c);
+					MoveLeft(d);
 					form.changeForm();
 					break;
 				}
-				if (f == 2 && cB(a, 1, -1) && cB(c, -1, -1) && cB(d, -2, -2)) {
-					MoveRight(form.a);
-					MoveDown(form.a);
-					MoveDown(form.c);
-					MoveLeft(form.c);
-					MoveDown(form.d);
-					MoveDown(form.d);
-					MoveLeft(form.d);
-					MoveLeft(form.d);
+				if (f == 2 && cB(a, 0, 2) && cB(b, 1, 1) && cB(c, 0, 0) && cB(d, -1, -1)) {
+					MoveDown(a);
+					MoveDown(a);
+
+					MoveRight(b);
+					MoveDown(b);
+
+					MoveUp(d);
+					MoveLeft(d);
 					form.changeForm();
 					break;
 				}
-				if (f == 3 && cB(a, 1, -1) && cB(c, -1, -1) && cB(d, -2, -2)) {
-					MoveRight(form.a);
-					MoveDown(form.a);
-					MoveDown(form.c);
-					MoveLeft(form.c);
-					MoveDown(form.d);
-					MoveDown(form.d);
-					MoveLeft(form.d);
-					MoveLeft(form.d);
+				if (f == 3 && cB(a, -2, 0) && cB(b, -1, 1) && cB(c, 0, 0) && cB(d, 1, -1)) {
+					MoveLeft(a);
+					MoveLeft(a);
+
+					MoveDown(b);
+					MoveLeft(b);
+
+					MoveRight(d);
+					MoveUp(d);
 					form.changeForm();
 					break;
 				}
-				if (f == 4 && cB(a, 1, -1) && cB(c, -1, -1) && cB(d, -2, -2)) {
-					MoveRight(form.a);
-					MoveDown(form.a);
-					MoveDown(form.c);
-					MoveLeft(form.c);
-					MoveDown(form.d);
-					MoveDown(form.d);
-					MoveLeft(form.d);
-					MoveLeft(form.d);
+				if (f == 4 && cB(a, 0, -1) && cB(b, -1, 0) && cB(c, 0, 1) && cB(d, 1, 2)) {
+					MoveUp(a);
+
+					MoveLeft(b);
+
+					MoveDown(c);
+
+					MoveDown(d);
+					MoveDown(d);
+					MoveRight(d);
+					form.changeForm();
+					break;
+				}
+				break;
+
+			case "l":
+				if (f == 1 && cB(a, -1, 1) && cB(b, 0, -2) && cB(c, -1, -1) && cB(d, -2, 0)) {
+					MoveLeft(a);
+					MoveDown(a);
+
+					MoveUp(b);
+					MoveUp(b);
+
+					MoveUp(c);
+					MoveLeft(c);
+
+					MoveLeft(d);
+					MoveLeft(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(a, -2, 0) && cB(b, 1, 1) && cB(c, 0, 0) && cB(d, -1, -1)) {
+					MoveLeft(a);
+					MoveLeft(a);
+
+					MoveRight(b);
+					MoveDown(b);
+
+					MoveUp(d);
+					MoveLeft(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(a, 1, -2) && cB(b, 0, 1) && cB(c, 1, 0) && cB(d, 2, -1)) {
+					MoveRight(a);
+					MoveUp(a);
+					MoveUp(a);
+
+					MoveDown(b);
+
+					MoveRight(c);
+
+					MoveRight(d);
+					MoveRight(d);
+					MoveUp(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(a, 2, 1) && cB(b, -1, 0) && cB(c, 0, 1) && cB(d, 1, 2)) {
+					MoveDown(a);
+					MoveRight(a);
+					MoveRight(a);
+
+					MoveLeft(b);
+
+					MoveDown(c);
+
+					MoveDown(d);
+					MoveDown(d);
+					MoveRight(d);
+					form.changeForm();
+					break;
+				}
+				break;
+			case "i":
+				if (f == 1 && cB(a, 1, -2) && cB(b, 0, -1) && cB(c, 0, -1) && cB(d, -2, 1)) {
+					MoveRight(a);
+					MoveUp(a);
+					MoveUp(a);
+
+					MoveUp(b);
+
+					MoveLeft(c);
+
+					MoveLeft(d);
+					MoveLeft(d);
+					MoveDown(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(a, 2, 1) && cB(b, 0, 0) && cB(c, 0, 1) && cB(d, -1, -2)) {
+					MoveRight(a);
+					MoveRight(a);
+					MoveDown(a);
+
+					MoveRight(b);
+
+					MoveUp(c);
+
+					MoveUp(d);
+					MoveUp(d);
+					MoveLeft(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(a, -1, 2) && cB(b, 0, 1) && cB(c, 1, 0) && cB(d, 2, -1)) {
+					MoveLeft(a);
+					MoveDown(a);
+					MoveDown(a);
+
+					MoveDown(b);
+
+					MoveRight(c);
+
+					MoveRight(d);
+					MoveRight(d);
+					MoveUp(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(a, -2, -1) && cB(b, -1, 0) && cB(c, 0, 1) && cB(d, 1, 2)) {
+					MoveLeft(a);
+					MoveLeft(a);
+					MoveUp(a);
+
+					MoveLeft(b);
+
+					MoveDown(c);
+
+					MoveRight(d);
+					MoveDown(d);
+					MoveDown(d);
+
+					form.changeForm();
+					break;
+				}
+
+			case "o":
+				// "O" shape does not rotate
+				break;
+
+			case "t":
+				if (f == 1 && cB(a, 1, -1) && cB(b, 0, 0) && cB(c, -1, -1) && cB(d, -1, 1)) {
+					MoveRight(a);
+					MoveUp(a);
+
+					MoveLeft(c);
+					MoveUp(c);
+
+					MoveLeft(d);
+					MoveDown(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(a, 1, 1) && cB(b, 0, 0) && cB(c, 1, -1) && cB(d, -1, -1)) {
+					MoveRight(a);
+					MoveDown(a);
+
+					MoveRight(c);
+					MoveUp(c);
+
+					MoveLeft(d);
+					MoveUp(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(a, -1, 1) && cB(b, 0, 0) && cB(c, 1, 1) && cB(d, 1, -1)) {
+					MoveLeft(a);
+					MoveDown(a);
+
+					MoveRight(c);
+					MoveDown(c);
+
+					MoveRight(d);
+					MoveUp(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(a, -1, -1) && cB(b, 0, 0) && cB(c, -1, 1) && cB(d, 1, 1)) {
+					MoveLeft(a);
+					MoveUp(a);
+
+					MoveLeft(c);
+					MoveDown(c);
+
+					MoveRight(d);
+					MoveDown(d);
+					form.changeForm();
+					break;
+				}
+				break;
+
+			case "z":
+				if (f == 1 && cB(a, -1, 0) && cB(b, 0, 1) && cB(c, 0, -1) && cB(d, -1, -2)) {
+					MoveLeft(a);
+
+					MoveDown(b);
+
+					MoveUp(c);
+
+					MoveLeft(d);
+					MoveUp(d);
+					MoveUp(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(a, 2, -1) && cB(b, 1, -2) && cB(c, 1, 0) && cB(d, 2, 1)) {
+					MoveRight(a);
+					MoveRight(a);
+					MoveUp(a);
+
+					MoveRight(b);
+					MoveUp(b);
+					MoveUp(b);
+
+					MoveRight(c);
+
+					MoveRight(d);
+					MoveRight(d);
+					MoveDown(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(a, -1, 2) && cB(b, 0, 3) && cB(c, 0, 1) && cB(d, -1, 0)) {
+					MoveLeft(a);
+					MoveDown(a);
+					MoveDown(a);
+
+					MoveDown(b);
+					MoveDown(b);
+					MoveDown(b);
+
+					MoveDown(c);
+
+					MoveLeft(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(a, 0, -1) && cB(b, -1, -2) && cB(c, -1, 0) && cB(d, 0, 1)) {
+					MoveUp(a);
+
+					MoveLeft(b);
+					MoveUp(b);
+					MoveUp(b);
+
+					MoveLeft(c);
+
+					MoveDown(d);
+					form.changeForm();
+					break;
+				}
+				break;
+
+			case "s":
+				if (f == 1 && cB(a, -1, 1) && cB(b, 0, 0) && cB(c, -1, -1) && cB(d, 0, -2)) {
+					MoveLeft(a);
+					MoveDown(a);
+
+					MoveUp(c);
+					MoveLeft(c);
+
+					MoveUp(d);
+					MoveUp(d);
+
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(a, -1, -1) && cB(b, 0, 0) && cB(c, 1, -1) && cB(d, 2, 0)) {
+					MoveUp(a);
+					MoveLeft(a);
+
+					MoveRight(c);
+					MoveUp(c);
+
+					MoveRight(d);
+					MoveRight(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(a, 1, -1) && cB(b, 0, 0) && cB(c, 1, 1) && cB(d, 0, 2)) {
+					MoveRight(a);
+					MoveUp(a);
+
+					MoveRight(c);
+					MoveDown(c);
+
+					MoveDown(d);
+					MoveDown(d);
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(a, 1, 1) && cB(b, 0, 0) && cB(c, -1, 1) && cB(d, -2, 0)) {
+					MoveRight(a);
+					MoveDown(a);
+
+					MoveLeft(c);
+					MoveDown(c);
+
+					MoveLeft(d);
+					MoveLeft(d);
+
 					form.changeForm();
 					break;
 				}
@@ -218,10 +530,12 @@ public class TetrisGame extends Application {
 	}
 
 	private static void RemoveRows(Pane pane) {
-		ArrayList<Node> rects = new ArrayList<Node>();
-		ArrayList<Integer> lines = new ArrayList<Integer>();
-		ArrayList<Node> newrects = new ArrayList<Node>();
+		ArrayList<Node> rects = new ArrayList<>();
+		ArrayList<Integer> lines = new ArrayList<>();
+		ArrayList<Node> newrects = new ArrayList<>();
 		int full = 0;
+
+		// Поиск заполненных линий
 		for (int i = 0; i < MESH[0].length; i++) {
 			for (int j = 0; j < MESH.length; j++) {
 				if (MESH[j][i] == 1) {
@@ -229,54 +543,65 @@ public class TetrisGame extends Application {
 				}
 			}
 			if (full == MESH.length) {
-				lines.add(i + lines.size());
+				lines.add(i); // Запоминаем индексы полных строк
 			}
 			full = 0;
 		}
-		if (lines.size() > 0) {
-			do {
-				for (Node node : pane.getChildren()) {
-					if (node instanceof Rectangle)
-						rects.add(node);
-				}
-				score += 50;
-				linesNo++;
-				for (Node node : rects) {
-					Rectangle a = (Rectangle) node;
-					if (a.getY() == lines.get(0) * SIZE) {
-						MESH[(int) a.getX() / SIZE][(int) a.getY() / SIZE] = 0;
-						pane.getChildren().remove(node);
-					} else {
-						newrects.add(node);
-					}
-				}
-				for (Node node : newrects) {
-					Rectangle a = (Rectangle) node;
-					if (a.getY() < lines.get(0) * SIZE) {
-						MESH[(int) a.getX() / SIZE][(int) a.getY() / SIZE] = 0;
-						a.setY(a.getY() + SIZE);
-					}
-					lines.remove(0);
-					rects.clear();
-					newrects.clear();
-					for (Node node2 : pane.getChildren()) {
-						if (node2 instanceof Rectangle) {
-							rects.add(node);
-						}
-					}
-					for (Node node2 : rects) {
-						Rectangle a2 = (Rectangle) node2;
-						try {
-							MESH[(int) a.getX() / SIZE][(int) a.getY() / SIZE] = 1;
-						} catch (ArrayIndexOutOfBoundsException e) {
-							System.out.println("ERROR: " + e);
-						}
-					}
-				}
-				rects.clear();
 
-			} while (lines.size() > 0);
+		if (!lines.isEmpty()) {
+			// Удаление заполненных линий
+			for (int line : lines) {
+				List<Node> toRemove = new ArrayList<>();
+				for (Node node : pane.getChildren()) {
+					if (node instanceof Rectangle) {
+						Rectangle rect = (Rectangle) node;
+						if (rect.getY() == line * SIZE) {
+							MESH[(int) rect.getX() / SIZE][(int) rect.getY() / SIZE] = 0;
+							toRemove.add(node);
+						} else {
+							newrects.add(node);
+						}
+					}
+				}
+				pane.getChildren().removeAll(toRemove);
+			}
+
+			// Перемещение оставшихся узлов вниз
+			for (Node node : newrects) {
+				if (node instanceof Rectangle) {
+					Rectangle rect = (Rectangle) node;
+					int originalY = (int) rect.getY() / SIZE;
+
+					// Считаем количество удалённых строк ниже текущей
+					long rowsBelow = lines.stream().filter(line -> originalY < line).count();
+
+					if (rowsBelow > 0) {
+						int oldX = (int) rect.getX() / SIZE;
+						int oldY = (int) rect.getY() / SIZE;
+						MESH[oldX][oldY] = 0; // Обнуляем старую позицию в MESH
+						rect.setY(rect.getY() + rowsBelow * SIZE); // Сдвигаем вниз
+					}
+				}
+			}
+
+			// Обновление массива MESH
+			for (Node node : pane.getChildren()) {
+				if (node instanceof Rectangle) {
+					Rectangle rect = (Rectangle) node;
+					try {
+						int x = (int) rect.getX() / SIZE;
+						int y = (int) rect.getY() / SIZE;
+						MESH[x][y] = 1;
+					} catch (ArrayIndexOutOfBoundsException e) {
+						System.out.println("ERROR: " + e);
+					}
+				}
+			}
 		}
+
+		// Увеличиваем счет
+		score += 50 * lines.size();
+		linesNo += lines.size();
 	}
 
 	private static void MoveDown(Rectangle rect) {
@@ -319,7 +644,7 @@ public class TetrisGame extends Application {
 			moveOnKeyPress(a);
 
 		}
-		
+
 		if (form.a.getY() + MOVE < YMAX && form.b.getY() + MOVE < YMAX && form.c.getY() + MOVE < YMAX
 				&& form.d.getY() + MOVE < YMAX) {
 			int movea = MESH[(int) form.a.getX() / SIZE][((int) form.a.getY() / SIZE) + 1];
@@ -352,17 +677,18 @@ public class TetrisGame extends Application {
 	}
 
 	private static boolean cB(Rectangle rect, int x, int y) {
-		boolean yb = false;
-		boolean xb = false;
-		if (x >= 0)
-			xb = rect.getX() + x * MOVE <= XMAX - SIZE;
-		if (x < 0)
-			xb = rect.getX() + x * MOVE >= 0;
-		if (y >= 0)
-			xb = rect.getY() + y * MOVE > 0;
-		if (y < 0)
-			xb = rect.getY() + y * MOVE < YMAX;
-		return xb && yb && MESH[((int) rect.getX() / SIZE) + x][((int) rect.getY() / SIZE) + y] == 0;
+		try {
+			int newX = ((int) rect.getX() / SIZE) + x;
+			int newY = ((int) rect.getY() / SIZE) + y;
+
+			if (newX <= 0 || newX >= MESH.length || newY <= 0 || newY >= MESH[0].length) {
+				return false;
+			}
+
+			return MESH[newX][newY] == 0;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return false;
+		}
 	}
 
 }

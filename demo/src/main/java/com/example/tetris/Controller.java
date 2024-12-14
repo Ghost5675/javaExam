@@ -6,10 +6,10 @@ public class Controller {
 
     public static final int MOVE = TetrisGame.MOVE;
     public static final int SIZE = TetrisGame.SIZE;
-    
+
     public static int XMAX = TetrisGame.XMAX;
     public static int YMAX = TetrisGame.YMAX;
-    
+
     public static int[][] MESH = TetrisGame.MESH;
 
     public static void MoveRight(FormFigure form) {
@@ -47,7 +47,8 @@ public class Controller {
     public static FormFigure makeRect() {
         int block = (int) (Math.random() * 100);
         String name;
-        Rectangle a = new Rectangle(SIZE - 1, SIZE - 1), b = new Rectangle(SIZE - 1, SIZE - 1),
+        Rectangle a = new Rectangle(SIZE - 1, SIZE - 1), b = new Rectangle(SIZE - 1,
+                SIZE - 1),
                 c = new Rectangle(SIZE - 1, SIZE - 1),
                 d = new Rectangle(SIZE - 1, SIZE - 1);
         if (block < 15) {
@@ -108,4 +109,5 @@ public class Controller {
         }
         return new FormFigure(a, b, c, d, name);
     }
+
 }
