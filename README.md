@@ -27,3 +27,6 @@ CREATE TABLE `arcade_machine`.`user` (
 ```  
 
 Эти SQL-запросы помогут вам подготовить структуру базы данных для проекта.
+
+
+## Source Tetrs: https://github.com/Gaspared/tetris
