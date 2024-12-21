@@ -1,35 +1,22 @@
 package com.example.tetris;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.css.Size;
 import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
-import javafx.stage.Stage;
 
 public class TetrisGame extends Application {
 
@@ -63,13 +50,11 @@ public class TetrisGame extends Application {
 
 		for (int i = 0; i < XMAX; i += MOVE) {
 			Line line = new Line(i, 0, i, YMAX);
-			line.setStroke(Color.WHITE);
 			group.getChildren().addAll(line);
 		}
 
 		for (int i = 0; i <= YMAX; i += MOVE) {
 			Line line = new Line(0, i, XMAX, i);
-			line.setStroke(Color.WHITE);
 			group.getChildren().addAll(line);
 		}
 
@@ -88,8 +73,6 @@ public class TetrisGame extends Application {
 		level.setFill(Color.GREEN);
 
 		group.getChildren().addAll(scoretext, line, level);
-
-		group.setStyle("-fx-background-color: BLACK");
 
 		FormFigure a = nextObj;
 		group.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -127,7 +110,7 @@ public class TetrisGame extends Application {
 
 						if (top == 15) {
 							System.exit(0);
-						}
+						}   
 						if (game) {
 							MoveDown(object);
 							scoretext.setText("Score: " + score);
@@ -140,6 +123,13 @@ public class TetrisGame extends Application {
 
 		};
 		fall.schedule(task, 0, 300);
+		stage.setOnCloseRequest(event -> {
+			group.getChildren().clear();
+			top = 0;
+			score = 0;
+			linesNo = 0;
+			System.out.println("close window");
+		});
 	}
 
 	private void moveOnKeyPress(FormFigure form) {
@@ -530,7 +520,6 @@ public class TetrisGame extends Application {
 	}
 
 	private static void RemoveRows(Pane pane) {
-		ArrayList<Node> rects = new ArrayList<>();
 		ArrayList<Integer> lines = new ArrayList<>();
 		ArrayList<Node> newrects = new ArrayList<>();
 		int full = 0;
@@ -611,7 +600,7 @@ public class TetrisGame extends Application {
 	}
 
 	private static void MoveRight(Rectangle rect) {
-		if (rect.getX() + MOVE < XMAX - SIZE) {
+		if (rect.getX() + MOVE < XMAX) {
 			rect.setX(rect.getX() + MOVE);
 		}
 	}
@@ -690,5 +679,4 @@ public class TetrisGame extends Application {
 			return false;
 		}
 	}
-
 }

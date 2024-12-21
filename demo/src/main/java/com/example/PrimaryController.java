@@ -1,12 +1,11 @@
 package com.example;
 
+import com.example.pacman.PacManGame;
 import com.example.tetris.TetrisGame;
 
 import javafx.scene.control.Label;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -41,8 +40,8 @@ public class PrimaryController {
     @FXML
     public void logIn() throws Exception {
         Stage newStage = new Stage();
-        TetrisGame game = new TetrisGame();
-        game.start(newStage);
         
+        PacManGame game = new PacManGame();
+        game.start(newStage);
     }
 }
