@@ -1,5 +1,6 @@
 package com.example.pacman;
 
+import javafx.css.Size;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
@@ -10,17 +11,17 @@ public class PacManController {
         int[][] MESH = PacManGame.MESH;
         int newX = (int) object.getX() + dx * PacManGame.SIZE;
         int newY = (int) object.getY() + dy * PacManGame.SIZE;
-
-        if (newX >= 0 && newX < PacManGame.XMAX && newY >= 0 && newY < PacManGame.YMAX && MESH[newX / PacManGame.SIZE][newY / PacManGame.SIZE] != 3) {
+        PacManGame.pacMan.setX(newX / PacManGame.SIZE);
+        PacManGame.pacMan.setY(newY / PacManGame.SIZE);
+        if (newX >= 0 && newX < PacManGame.XMAX && newY >= 0 && newY < PacManGame.YMAX
+                && MESH[newX / PacManGame.SIZE][newY / PacManGame.SIZE] != 3 && MESH[newX / PacManGame.SIZE][newY / PacManGame.SIZE] != 4) {
             object.setX(newX);
             object.setY(newY);
         }
     }
 
-    // Метод для Pac-Man
     public static void movePacMan(int dx, int dy) {
         move(PacManGame.pacMan.getSprite(), dx, dy);
     }
 
-    
 }

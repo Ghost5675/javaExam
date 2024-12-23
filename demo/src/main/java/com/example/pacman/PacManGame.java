@@ -5,10 +5,9 @@ import java.io.FileReader;
 import java.util.Arrays;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -19,8 +18,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.example.tetris.FormFigure;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PacManGame extends Application {
     public static final int MOVE = 16;
@@ -46,11 +46,11 @@ public class PacManGame extends Application {
 
     public static PacMan pacMan = new PacMan(initalXPacMan, initalYPacMan, "/com/example/forPacMan/pacman.png", SIZE);
     public static Ghost blinky = new Ghost(initalXBlinky, initalYBlinky, "/com/example/forPacMan/blinky.png", SIZE,
-            "Red");
-    public static Ghost pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE, "Pink");
-    public static Ghost inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "Cyan");
+            "blinky");
+    public static Ghost pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE, "pinky");
+    public static Ghost inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "inky");
     public static Ghost clyde = new Ghost(initalXClyde, initalYClyde, "/com/example/forPacMan/clyde.png", SIZE,
-            "Oreange");
+            "clyde");
 
     private static Pane gameBoard = new Pane();
 
@@ -60,13 +60,21 @@ public class PacManGame extends Application {
 
     private static boolean game = true;
 
+    private static int live = 3;
+
+    Text highScore = new Text("HIGH SCORE: 0");
+    Text score = new Text("SCORE: 0");
+    Text Live = new Text("Live: " + live);
+
+    int scoreUpdate = 0;
+    int highScoreValue = 0;
+
     @Override
     public void start(Stage stage) throws Exception {
         for (int[] a : MESH) {
             Arrays.fill(a, 0);
         }
 
-        // Загрузка файла карты
         String filePath = getClass().getResource("/com/example/forPacMan/PacManMAP.txt").getPath();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -82,10 +90,6 @@ public class PacManGame extends Application {
 
         gameBoard.setStyle("-fx-background-color: black");
 
-        // Отображение текста для счёта
-        Text highScore = new Text("HIGH SCORE:");
-        Text score = new Text("SCORE:");
-
         highScore.setStyle("-fx-fill: WHITE; -fx-font-size: 16px; -fx-font-weight: bold;");
         highScore.setX(XMAX + 16);
         highScore.setY(16);
@@ -94,9 +98,12 @@ public class PacManGame extends Application {
         score.setX(XMAX + 16);
         score.setY(48);
 
-        gameBoard.getChildren().addAll(highScore, score);
+        Live.setStyle("-fx-fill: WHITE; -fx-font-size: 16px; -fx-font-weight: bold;");
+        Live.setX(XMAX + 16);
+        Live.setY(YMAX - 80);
 
-        // Отрисовка сетки
+        gameBoard.getChildren().addAll(highScore, score, Live);
+
         for (int i = 0; i <= XMAX; i += MOVE) {
             Line line = new Line(i, 0, i, YMAX);
             gameBoard.getChildren().add(line);
@@ -106,7 +113,6 @@ public class PacManGame extends Application {
             gameBoard.getChildren().add(line);
         }
 
-        // Отрисовка карты
         for (int y = 0; y < MESH.length; y++) {
             for (int x = 0; x < MESH[y].length; x++) {
                 Rectangle rect = new Rectangle(y * SIZE, x * SIZE, SIZE, SIZE);
@@ -114,6 +120,10 @@ public class PacManGame extends Application {
                 gameBoard.getChildren().add(rect);
 
                 switch (MESH[y][x]) {
+                    case 4:
+                        rect.setFill(Color.GRAY);
+                        break;
+
                     case 3:
                         rect.setFill(Color.BLUE);
                         break;
@@ -149,58 +159,215 @@ public class PacManGame extends Application {
         gameBoard.getChildren().add(clyde.getSprite());
 
         moveOnKeyPress();
+        setupGhostModeTimer();
 
         stage.setResizable(false);
         stage.setTitle("PACMAN");
         stage.setScene(scene);
         stage.show();
+
     }
 
-    private Timer currentTimer = null; // Общий таймер для движения
-    private TimerTask currentTask = null; // Текущая задача движения
+    private Timer currentTimer = null;
+    private TimerTask currentTask = null;
 
     private void moveOnKeyPress() {
         scene.setOnKeyPressed(event -> {
-            // Остановить текущий таймер, если он существует
             if (currentTimer != null) {
                 currentTimer.cancel();
                 currentTimer = null;
                 currentTask = null;
             }
 
-            // Создать новый таймер и задачу для движения
             currentTimer = new Timer();
             switch (event.getCode()) {
                 case W:
-                    currentTask = createMovementTask(0, -1); // Движение вверх
-                    break;
-                case S:
-                    currentTask = createMovementTask(0, 1); // Движение вниз
+                    currentTask = createMovementTask(0, -1);
                     break;
                 case A:
-                    currentTask = createMovementTask(-1, 0); // Движение влево
+                    currentTask = createMovementTask(-1, 0);
+                    break;
+                case S:
+                    currentTask = createMovementTask(0, 1);
                     break;
                 case D:
-                    currentTask = createMovementTask(1, 0); // Движение вправо
+                    currentTask = createMovementTask(1, 0);
                     break;
                 default:
-                    return; // Ничего не делать для других клавиш
+                    return;
             }
 
-            // Запуск новой задачи с интервалом 100 мс
             currentTimer.schedule(currentTask, 0, 150);
         });
     }
 
-    // Метод для создания задачи движения
     private TimerTask createMovementTask(int dx, int dy) {
         return new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> {
+                    checkAndEatPoint();
+                    checkAndEatPill();
+                    checkAndEatGhost();
                     PacManController.movePacMan(dx, dy);
                 });
             }
         };
+    }
+
+    private void checkAndEatPoint() {
+        // Текущие координаты Pac-Man в сетке
+        int pacManX = (int) (pacMan.getX());
+        int pacManY = (int) (pacMan.getY());
+
+        if (MESH[pacManX][pacManY] == 1) {
+            MESH[pacManX][pacManY] = 0;
+            scoreUpdate += 10;
+            score.setText("SCORE: " + scoreUpdate);
+
+            updateHighScore();
+
+            removePointFromGameBoard(pacManX, pacManY);
+        }
+    }
+
+    private void checkAndEatPill() {
+        int pacManX = (int) (pacMan.getX());
+        int pacManY = (int) (pacMan.getY());
+
+        if (MESH[pacManX][pacManY] == 2) {
+            startFrightenedMode();
+
+            scoreUpdate += 50;
+            score.setText("SCORE: " + scoreUpdate);
+
+            updateHighScore();
+
+            MESH[pacManX][pacManY] = 0;
+            removePointFromGameBoard(pacManX, pacManY);
+
+        }
+
+    }
+
+    private void checkAndEatGhost() {
+        int pacManX = (int) (pacMan.getX());
+        int pacManY = (int) (pacMan.getY());
+
+        Ghost[] ghosts = { blinky, pinky, inky, clyde };
+
+        for (Ghost ghost : ghosts) {
+            int ghostX = (int) (ghost.getX());
+            int ghostY = (int) (ghost.getY());
+
+            if (ghostX == pacManX && ghostY == pacManY) {
+                System.out.println(ghostX + " " + ghost.getname() + " " + ghostY);
+                if (ghost.isEaten) {
+                    ghost.setX(11 * SIZE);
+                    ghost.setY(14 * SIZE);
+
+                    ghost.getSprite().setX(11 * SIZE);
+                    ghost.getSprite().setY(14 * SIZE);
+
+                    scoreUpdate += 200;
+                    score.setText("SCORE: " + scoreUpdate);
+                    updateHighScore();
+
+                    System.out.println(ghost.getname() + " съеден!");
+                } else {
+
+                    live -= 1;
+                    Live.setText("Live: " + live);
+
+                    pacMan.setX(initalXPacMan * SIZE);
+                    pacMan.setY(initalYPacMan * SIZE);
+
+                    pacMan.getSprite().setX(initalXPacMan * SIZE);
+                    pacMan.getSprite().setY(initalYPacMan * SIZE);
+
+                    if (live <= 0) {
+                        System.out.println("Игра окончена!");
+                        gameOver();
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void startFrightenedMode() {
+        blinky.Frightened();
+        pinky.Frightened();
+        inky.Frightened();
+        clyde.Frightened();
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        Runnable task = () -> {
+            Platform.runLater(() -> {
+                
+                Ghost[] ghosts = { blinky, pinky, inky, clyde };
+                for (Ghost ghost : ghosts) {
+                    ghost.NormalMode();
+                    
+                }
+            });
+            scheduler.shutdown();
+        };
+
+        System.out.println("Режим страха активен на 5 секунд...");
+        scheduler.schedule(task, 5, TimeUnit.SECONDS);
+    }
+
+    private void removePointFromGameBoard(int x, int y) {
+        gameBoard.getChildren().removeIf(node -> {
+            if (node instanceof Circle) {
+                Circle point = (Circle) node;
+                return (int) point.getCenterX() / SIZE == x && (int) point.getCenterY() / SIZE == y;
+            }
+            return false;
+        });
+    }
+
+    private void updateHighScore() {
+        if (scoreUpdate > highScoreValue) {
+            highScoreValue = scoreUpdate;
+            highScore.setText("HIGH SCORE: " + highScoreValue);
+        }
+    }
+
+    private void setupGhostModeTimer() {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        Runnable modeSwitcher = new Runnable() {
+            private boolean isScatter = true;
+
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    Ghost.GhostMode newMode = isScatter ? Ghost.GhostMode.CHASE : Ghost.GhostMode.SCATTER;
+                    isScatter = !isScatter;
+
+                    blinky.setMode(newMode);
+                    pinky.setMode(newMode);
+                    inky.setMode(newMode);
+                    clyde.setMode(newMode);
+                });
+            }
+        };
+
+        // Переключаем режим каждые 7 секунд (Scatter -> Chase -> Scatter и т.д.)
+        scheduler.scheduleAtFixedRate(modeSwitcher, 0, 7, TimeUnit.SECONDS);
+    }
+
+    private void gameOver() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText("You lost all lives!");
+            alert.setContentText("Final Score: " + scoreUpdate);
+            alert.showAndWait();
+            System.exit(0); // Завершаем приложение
+        });
     }
 }
