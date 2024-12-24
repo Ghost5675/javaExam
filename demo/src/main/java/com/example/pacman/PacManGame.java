@@ -3,6 +3,7 @@ package com.example.pacman;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -44,14 +45,6 @@ public class PacManGame extends Application {
     public static final int initalXClyde = 15;
     public static final int initalYClyde = 14;
 
-    public static PacMan pacMan = new PacMan(initalXPacMan, initalYPacMan, "/com/example/forPacMan/pacman.png", SIZE);
-    public static Ghost blinky = new Ghost(initalXBlinky, initalYBlinky, "/com/example/forPacMan/blinky.png", SIZE,
-            "blinky");
-    public static Ghost pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE, "pinky");
-    public static Ghost inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "inky");
-    public static Ghost clyde = new Ghost(initalXClyde, initalYClyde, "/com/example/forPacMan/clyde.png", SIZE,
-            "clyde");
-
     private static Pane gameBoard = new Pane();
 
     public static int[][] MESH = new int[XMAX / SIZE][YMAX / SIZE];
@@ -61,14 +54,24 @@ public class PacManGame extends Application {
     private static boolean game = true;
 
     private static int live = 3;
+    private static int Score = 0;
 
-    Text highScore = new Text("HIGH SCORE: " + DatabaseConnection.getHighScore("pacman", DatabaseConnection.currentEmail));
-    Text score = new Text("SCORE: 0");
+    Text score = new Text("SCORE: " + Score);
     Text Live = new Text("Live: " + live);
     Text user = new Text("User: " + DatabaseConnection.currentUser);
 
     int scoreUpdate = 0;
-    int highScoreValue = 0;
+    int highScoreValue = DatabaseConnection.getHighScore("pacman", DatabaseConnection.currentEmail);
+    Text highScore = new Text(
+            "HIGH SCORE: " + highScoreValue);
+    public static PacMan pacMan = new PacMan(initalXPacMan, initalYPacMan, "/com/example/forPacMan/pacman.png", SIZE);
+    public static Ghost blinky = new Ghost(initalXBlinky, initalYBlinky, "/com/example/forPacMan/blinky.png", SIZE,
+            "blinky");
+    public static Ghost pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE,
+            "pinky");
+    public static Ghost inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "inky");
+    public static Ghost clyde = new Ghost(initalXClyde, initalYClyde, "/com/example/forPacMan/clyde.png", SIZE,
+            "clyde");
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -213,7 +216,14 @@ public class PacManGame extends Application {
                     checkAndEatPoint();
                     checkAndEatPill();
                     checkAndEatGhost();
+                    if (checkPillAndPoint(MESH)) {
+                        changeLevel();
+                    }
                     PacManController.movePacMan(dx, dy);
+                    PacManController.moveGhost(blinky);
+                    PacManController.moveGhost(inky);
+                    PacManController.moveGhost(pinky);
+                    PacManController.moveGhost(clyde);
                 });
             }
         };
@@ -309,11 +319,11 @@ public class PacManGame extends Application {
 
         Runnable task = () -> {
             Platform.runLater(() -> {
-                
+
                 Ghost[] ghosts = { blinky, pinky, inky, clyde };
                 for (Ghost ghost : ghosts) {
                     ghost.NormalMode();
-                    
+
                 }
             });
             scheduler.shutdown();
@@ -340,17 +350,171 @@ public class PacManGame extends Application {
         }
     }
 
-    
-
-    private void gameOver(){
+    private void gameOver() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game Over");
-            alert.setHeaderText("You lost all lives!");
-            alert.setContentText("Final Score: " + scoreUpdate);
-            alert.showAndWait();
-            DatabaseConnection.changeScore(DatabaseConnection.currentEmail, highScoreValue, "pacman");
-            
+            // 1. Полная очистка текущего игрового поля
+            gameBoard.getChildren().clear();
+
+            // 2. Перерисовываем карту (если нужно)
+            for (int y = 0; y < MESH.length; y++) {
+                for (int x = 0; x < MESH[y].length; x++) {
+                    Rectangle rect = new Rectangle(y * SIZE, x * SIZE, SIZE, SIZE);
+                    rect.setFill(Color.BLACK);
+                    gameBoard.getChildren().add(rect);
+
+                    switch (MESH[y][x]) {
+                        case 4:
+                            rect.setFill(Color.GRAY);
+                            break;
+                        case 3:
+                            rect.setFill(Color.BLUE);
+                            break;
+                        case 1:
+                            Circle point = new Circle(y * SIZE + SIZE / 2.0, x * SIZE + SIZE / 2.0, SIZE * 0.15,
+                                    Color.YELLOW);
+                            gameBoard.getChildren().add(point);
+                            break;
+                        case 2:
+                            Circle pill = new Circle(y * SIZE + SIZE / 2.0, x * SIZE + SIZE / 2.0, SIZE * 0.3,
+                                    Color.RED);
+                            gameBoard.getChildren().add(pill);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            // (Если любите «сетку» на фоне, перерисуйте и её)
+            for (int i = 0; i <= XMAX; i += MOVE) {
+                Line line = new Line(i, 0, i, YMAX);
+                gameBoard.getChildren().add(line);
+            }
+            for (int i = 0; i < YMAX; i += MOVE) {
+                Line line = new Line(0, i, XMAX, i);
+                gameBoard.getChildren().add(line);
+            }
+
+            // 3. Сбрасываем игровые переменные
+            scoreUpdate = 0;
+            Score = 0;
+            live = 3;
+            score.setText("SCORE: " + Score);
+            Live.setText("Live: " + live);
+
+            // highScoreValue уже сохранён, не обнуляем, но обновляем отображение
+            highScore.setText("HIGH SCORE: " + highScoreValue);
+
+            // 4. Пере-создаём PacMan и призраков именно в СТАТИЧЕСКИХ переменных
+            pacMan = new PacMan(initalXPacMan, initalYPacMan, "/com/example/forPacMan/pacman.png", SIZE);
+            blinky = new Ghost(initalXBlinky, initalYBlinky, "/com/example/forPacMan/blinky.png", SIZE, "blinky");
+            pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE, "pinky");
+            inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "inky");
+            clyde = new Ghost(initalXClyde, initalYClyde, "/com/example/forPacMan/clyde.png", SIZE, "clyde");
+
+            // 5. Добавляем их спрайты на доску
+            gameBoard.getChildren().addAll(
+                    pacMan.getSprite(),
+                    blinky.getSprite(),
+                    pinky.getSprite(),
+                    inky.getSprite(),
+                    clyde.getSprite());
+
+            // Не забудьте вернуть и тексты с интерфейсом
+            gameBoard.getChildren().addAll(highScore, score, Live, user);
+
+            // 6. Снова навешиваем обработчик клавиш для новой «связки» объектов
+            moveOnKeyPress();
+
+            if (currentTimer != null) {
+                currentTimer.cancel();
+                currentTimer.purge();
+            }
         });
     }
+
+    private boolean checkPillAndPoint(int[][] arr) {
+        for (int[] is : arr) {
+            for (int is2 : is) {
+                if (is2 == 2 || is2 == 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    private void changeLevel(){
+        Platform.runLater(() -> {
+            gameBoard.getChildren().clear();
+
+            for (int y = 0; y < MESH.length; y++) {
+                for (int x = 0; x < MESH[y].length; x++) {
+                    Rectangle rect = new Rectangle(y * SIZE, x * SIZE, SIZE, SIZE);
+                    rect.setFill(Color.BLACK);
+                    gameBoard.getChildren().add(rect);
+
+                    switch (MESH[y][x]) {
+                        case 4:
+                            rect.setFill(Color.GRAY);
+                            break;
+                        case 3:
+                            rect.setFill(Color.BLUE);
+                            break;
+                        case 1:
+                            Circle point = new Circle(y * SIZE + SIZE / 2.0, x * SIZE + SIZE / 2.0, SIZE * 0.15,
+                                    Color.YELLOW);
+                            gameBoard.getChildren().add(point);
+                            break;
+                        case 2:
+                            Circle pill = new Circle(y * SIZE + SIZE / 2.0, x * SIZE + SIZE / 2.0, SIZE * 0.3,
+                                    Color.RED);
+                            gameBoard.getChildren().add(pill);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            for (int i = 0; i <= XMAX; i += MOVE) {
+                Line line = new Line(i, 0, i, YMAX);
+                gameBoard.getChildren().add(line);
+            }
+            for (int i = 0; i < YMAX; i += MOVE) {
+                Line line = new Line(0, i, XMAX, i);
+                gameBoard.getChildren().add(line);
+            }
+
+            scoreUpdate = 0;
+            Score = 0;
+            live = 3;
+            score.setText("SCORE: " + Score);
+            Live.setText("Live: " + live);
+
+            highScore.setText("HIGH SCORE: " + highScoreValue);
+
+            pacMan = new PacMan(initalXPacMan, initalYPacMan, "/com/example/forPacMan/pacman.png", SIZE);
+            blinky = new Ghost(initalXBlinky, initalYBlinky, "/com/example/forPacMan/blinky.png", SIZE, "blinky");
+            pinky = new Ghost(initalXPinky, initalYPinky, "/com/example/forPacMan/pinky.png", SIZE, "pinky");
+            inky = new Ghost(initalXInky, initalYInky, "/com/example/forPacMan/inky.png", SIZE, "inky");
+            clyde = new Ghost(initalXClyde, initalYClyde, "/com/example/forPacMan/clyde.png", SIZE, "clyde");
+
+            gameBoard.getChildren().addAll(
+                    pacMan.getSprite(),
+                    blinky.getSprite(),
+                    pinky.getSprite(),
+                    inky.getSprite(),
+                    clyde.getSprite());
+
+            gameBoard.getChildren().addAll(highScore, score, Live, user);
+
+            moveOnKeyPress();
+
+            if (currentTimer != null) {
+                currentTimer.cancel();
+                currentTimer.purge();
+            }
+        });
+    }
+
 }

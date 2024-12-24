@@ -1,11 +1,7 @@
 package com.example.pacman;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Queue;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javafx.scene.image.Image;
@@ -67,31 +63,79 @@ class Ghost extends PacMAnCharacter {
     }
 
     private GhostMode currentMode = GhostMode.SCATTER;
-    public boolean isEaten = false; // Состояние "съеден"
-    private String name; // Цвет призрака
-    private int initialX; // Начальная позиция X
-    private int initialY; // Начальная позиция Y
+    public boolean isEaten = false;
+    private String name;
+    private int initialX;
+    private int initialY;
+    private int dx;
+    private int dy;
+    private int[][] MESH = PacManGame.MESH;
 
     public Ghost(int x, int y, String imagePath, int size, String name) {
         super(x, y, imagePath, size);
         this.name = name;
-        this.initialX = x; // Сохраняем начальную позицию X
-        this.initialY = y; // Сохраняем начальную позицию Y
+        this.initialX = x;
+        this.initialY = y;
+
+        int[] initialDir = getRandomDirectionWithoutWall(x, y, MESH);
+        this.dx = initialDir[0];
+        this.dy = initialDir[1];
+
     }
 
-    // Геттер для начальной позиции X
+    private static int[] getRandomDirectionWithoutWall(int startX, int startY, int[][] MESH) {
+
+        List<int[]> directions = Arrays.asList(
+                new int[] { 0, -1 }, 
+                new int[] { 0, 1 }, 
+                new int[] { -1, 0 }, 
+                new int[] { 1, 0 } 
+        );
+
+        Collections.shuffle(directions);
+
+        for (int[] d : directions) {
+            int nx = startX + d[0];
+            int ny = startY + d[1];
+
+            if (nx >= 0 && nx < (PacManGame.XMAX / PacManGame.SIZE)
+                    && ny >= 0 && ny < (PacManGame.YMAX / PacManGame.SIZE)) {
+
+                if (MESH[nx][ny] != 3) {
+                    return d;
+                }
+            }
+        }
+
+        return new int[] { 0, 0 };
+    }
+
     public int getInitialX() {
         return initialX;
     }
 
-    // Геттер для начальной позиции Y
     public int getInitialY() {
         return initialY;
     }
 
-    // Геттер для цвета
     public String getname() {
         return name;
+    }
+
+    public int getDx() {
+        return dx;
+    }
+
+    public void setDx(int dx) {
+        this.dx = dx;
+    }
+
+    public int getDy() {
+        return dy;
+    }
+
+    public void setDy(int dy) {
+        this.dy = dy;
     }
 
     public void chase() {
@@ -130,7 +174,6 @@ class Ghost extends PacMAnCharacter {
     public void Frightened() {
         this.isEaten = true;
 
-        // Устанавливаем состояние страха с изменением изображения
         getSprite().setFill(new ImagePattern(
                 new Image(getClass().getResource("/com/example/forPacMan/frightness.png").toString())));
 
@@ -166,5 +209,4 @@ class Ghost extends PacMAnCharacter {
         return currentMode;
     }
 
-    
 }
