@@ -1,6 +1,5 @@
 package com.example.tetris;
 
-import javafx.event.EventHandler;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -30,25 +29,25 @@ public class FormFigure {
         this.name = name;
         switch (name) {
             case "j":
-                color = Color.SLATEGRAY;
+                color = Color.BLUE;
                 break;
             case "l":
-                color = Color.DARKGOLDENROD;
+                color = Color.ORANGE;
                 break;
             case "o":
-                color = Color.INDIANRED;
+                color = Color.YELLOW;
                 break;
             case "s":
-                color = Color.FORESTGREEN;
+                color = Color.GREEN;
                 break;
             case "t":
-                color = Color.CADETBLUE;
+                color = Color.MAGENTA;
                 break;
             case "z":
-                color = Color.HOTPINK;
+                color = Color.RED;
                 break;
             case "i":
-                color = Color.SANDYBROWN;
+                color = Color.CYAN;
                 break;
 
         }

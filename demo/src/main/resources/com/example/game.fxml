@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="343.0" prefWidth="620.0" style="-fx-background-color: #1e1e2c;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gamen">
+   <children>
+      <!-- изоброжение когда его будешь вставлять просто в css другой стайил ставишь и там увидешь -->
+      <StackPane layoutX="34.0" layoutY="155.0">
+         <Label styleClass="snake" />
+      </StackPane>
+
+      <!-- Разделительная линия -->
+      <Line endX="568.9999389648438" endY="0.4000091552734375" layoutX="50.0" layoutY="82.0" startX="-50.9999885559082" startY="-0.40000152587890625" stroke="#33e1ed" strokeWidth="3.0" />
+
+      <!-- Нижняя панель -->
+      <AnchorPane layoutX="-1.0" prefHeight="82.0" prefWidth="620.0" style="-fx-background-color: #2d2d44;">
+         <children>
+            <!-- Кнопка выхода -->
+            <Button graphicTextGap="0.0" layoutX="411.0" layoutY="25.0" mnemonicParsing="false" onAction="#outlog" prefHeight="32.0" prefWidth="184.0" style="-fx-background-color: #33e1ed; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px; -fx-cursor: hand;" text="Exit Account" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Arial Black" size="14.0" />
+               </font>
+            </Button>
+            <Label fx:id="Text" layoutX="25.0" layoutY="21.0" prefHeight="47.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <Button graphicTextGap="0.0" layoutX="80.0" layoutY="266.0" mnemonicParsing="false" onAction="#inPacMan" prefHeight="18.0" prefWidth="108.0" style="-fx-background-color: #33e1ed; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px; -fx-cursor: hand;" text="Pac-Man" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="Arial Black" size="14.0" />
+         </font>
+      </Button>
+      <Button graphicTextGap="0.0" layoutX="413.0" layoutY="266.0" mnemonicParsing="false" onAction="#inTetris" prefHeight="18.0" prefWidth="108.0" style="-fx-background-color: #33e1ed; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px; -fx-cursor: hand;" text="Tetris" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="Arial Black" size="14.0" />
+         </font>
+      </Button>
+      <StackPane layoutX="392.0" layoutY="155.0">
+         <children>
+            <Label styleClass="Game2" />
+         </children>
+      </StackPane>
+      <StackPane layoutX="209.0" layoutY="385.0">
+         <children>
+            <Label styleClass="Game3" />
+         </children>
+      </StackPane>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="34.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@forPacMan/2a8527c4-47f6-42b9-9fe6-31c78a1f0fb8.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="392.0" layoutY="107.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@forPacMan/DALL·E%202024-12-23%2019.25.56%20-%20A%20minimalist%20and%20colorful%20icon%20for%20a%20Tetris-inspired%20game.%20The%20design%20should%20feature%20vibrant%20falling%20blocks%20in%20classic%20Tetris%20shapes%20(L,%20T,%20square,%20an.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

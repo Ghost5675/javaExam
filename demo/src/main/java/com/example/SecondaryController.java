@@ -23,10 +23,13 @@ public class SecondaryController {
     }
 
     @FXML
-    private void log() {
+    private void log() throws Exception{
         String username = DatabaseConnection.checkLogIn(emailField.getText(), passwordField.getText());
         if (username != null) {
             display.setText("Welcome, " + username + "!");
+            DatabaseConnection.currentUser = username;
+            DatabaseConnection.currentEmail = emailField.getText();
+            App.setRoot("game");
         } else {
             display.setText("Invalid email or password");
         }

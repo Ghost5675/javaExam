@@ -1,10 +1,6 @@
 package com.example.pacman;
 
-import javafx.css.Size;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 
 public class PacManController {
     public static void move(Rectangle object, int dx, int dy) {

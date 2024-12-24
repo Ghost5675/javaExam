@@ -7,10 +7,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -21,6 +19,8 @@ import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.example.DatabaseConnection;
 
 public class PacManGame extends Application {
     public static final int MOVE = 16;
@@ -62,9 +62,10 @@ public class PacManGame extends Application {
 
     private static int live = 3;
 
-    Text highScore = new Text("HIGH SCORE: 0");
+    Text highScore = new Text("HIGH SCORE: " + DatabaseConnection.getHighScore("pacman", DatabaseConnection.currentEmail));
     Text score = new Text("SCORE: 0");
     Text Live = new Text("Live: " + live);
+    Text user = new Text("User: " + DatabaseConnection.currentUser);
 
     int scoreUpdate = 0;
     int highScoreValue = 0;
@@ -102,7 +103,11 @@ public class PacManGame extends Application {
         Live.setX(XMAX + 16);
         Live.setY(YMAX - 80);
 
-        gameBoard.getChildren().addAll(highScore, score, Live);
+        user.setStyle("-fx-fill: WHITE; -fx-font-size: 16px; -fx-font-weight: bold;");
+        user.setX(XMAX + 16);
+        user.setY(YMAX - 32);
+
+        gameBoard.getChildren().addAll(highScore, score, Live, user);
 
         for (int i = 0; i <= XMAX; i += MOVE) {
             Line line = new Line(i, 0, i, YMAX);
@@ -159,7 +164,6 @@ public class PacManGame extends Application {
         gameBoard.getChildren().add(clyde.getSprite());
 
         moveOnKeyPress();
-        setupGhostModeTimer();
 
         stage.setResizable(false);
         stage.setTitle("PACMAN");
@@ -336,38 +340,17 @@ public class PacManGame extends Application {
         }
     }
 
-    private void setupGhostModeTimer() {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    
 
-        Runnable modeSwitcher = new Runnable() {
-            private boolean isScatter = true;
-
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    Ghost.GhostMode newMode = isScatter ? Ghost.GhostMode.CHASE : Ghost.GhostMode.SCATTER;
-                    isScatter = !isScatter;
-
-                    blinky.setMode(newMode);
-                    pinky.setMode(newMode);
-                    inky.setMode(newMode);
-                    clyde.setMode(newMode);
-                });
-            }
-        };
-
-        // Переключаем режим каждые 7 секунд (Scatter -> Chase -> Scatter и т.д.)
-        scheduler.scheduleAtFixedRate(modeSwitcher, 0, 7, TimeUnit.SECONDS);
-    }
-
-    private void gameOver() {
+    private void gameOver(){
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Over");
             alert.setHeaderText("You lost all lives!");
             alert.setContentText("Final Score: " + scoreUpdate);
             alert.showAndWait();
-            System.exit(0); // Завершаем приложение
+            DatabaseConnection.changeScore(DatabaseConnection.currentEmail, highScoreValue, "pacman");
+            
         });
     }
 }

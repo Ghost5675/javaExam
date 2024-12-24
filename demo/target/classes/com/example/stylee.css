@@ -1,0 +1,51 @@
+.snake {
+    -fx-background-image: url("icon2.png");
+    -fx-background-size: 190px,165px;  /* Изображение подгоняется по размеру Label */
+    -fx-background-position: center; /* Центрирование изображения */
+    -fx-background-repeat: no-repeat; /* Не повторять изображение */
+    -fx-alignment: center; /* Центрирование контента (изображения и текста) в Label */
+    -fx-pref-width: 200px;   /* Устанавливаем предпочтительную ширину */
+    -fx-pref-height: 200px;  /* Устанавливаем предпочтительную высоту */
+    -fx-border-color: #000;  /* Цвет бордера */
+    -fx-border-width: 3px;   /* Ширина бордера */
+    -fx-border-radius: 10px; /* Округленные углы */
+    -fx-background-color: #2D2132;
+    -fx-background-radius: 10px;
+
+}
+.Game2{
+    -fx-background-image: url("icon2.png");
+    -fx-background-size: 190px,165px;  /* Изображение подгоняется по размеру Label */
+    -fx-background-position: center; /* Центрирование изображения */
+    -fx-background-repeat: no-repeat; /* Не повторять изображение */
+    -fx-alignment: center; /* Центрирование контента (изображения и текста) в Label */
+    -fx-pref-width: 200px;   /* Устанавливаем предпочтительную ширину */
+    -fx-pref-height: 200px;  /* Устанавливаем предпочтительную высоту */
+    -fx-border-color: #000;  /* Цвет бордера */
+    -fx-border-width: 3px;   /* Ширина бордера */
+    -fx-border-radius: 10px; /* Округленные углы */
+    -fx-background-color: #2D2132;
+    -fx-background-radius: 10px;
+}
+.Game3{
+    -fx-background-image: url("icon2.png");
+    -fx-background-size: 190px,165px;  /* Изображение подгоняется по размеру Label */
+    -fx-background-position: center; /* Центрирование изображения */
+    -fx-background-repeat: no-repeat; /* Не повторять изображение */
+    -fx-alignment: center; /* Центрирование контента (изображения и текста) в Label */
+    -fx-pref-width: 200px;   /* Устанавливаем предпочтительную ширину */
+    -fx-pref-height: 200px;  /* Устанавливаем предпочтительную высоту */
+    -fx-border-color: #000;  /* Цвет бордера */
+    -fx-border-width: 3px;   /* Ширина бордера */
+    -fx-border-radius: 10px; /* Округленные углы */
+    -fx-background-color: #2D2132;
+    -fx-background-radius: 10px;
+}
+
+
+
+
+
+
+
+

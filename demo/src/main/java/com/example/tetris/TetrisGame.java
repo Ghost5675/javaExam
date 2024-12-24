@@ -1,22 +1,26 @@
 package com.example.tetris;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.example.DatabaseConnection;
+
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class TetrisGame extends Application {
 
@@ -31,48 +35,68 @@ public class TetrisGame extends Application {
 	private static Pane group = new Pane();
 	private static FormFigure object;
 
-	private static Scene scene = new Scene(group, XMAX + 150, YMAX);
+	private static Scene scene = new Scene(group, XMAX + 200, YMAX);
 
 	public static int score = 0;
 	private static int top = 0;
+	private static int linesNo = 0;
+	private static int highScore = DatabaseConnection.getHighScore("tetris", DatabaseConnection.currentEmail);
 
 	private static boolean game = true;
 
 	private static FormFigure nextObj = Controller.makeRect();
 
-	private static int linesNo = 0;
+	Button reset = new Button("Reset");
+	Text scoretext = new Text("Score: " + score);
+	Text level = new Text("Lines: " + linesNo);
+	Text Highscoretext = new Text(
+			"High Score: " + highScore);
+	public static Timer fall = new Timer();
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		reset.setFocusTraversable(false);
+
+		if (fall != null) {
+			fall.cancel();
+			fall.purge(); 
+		}
 		for (int[] a : MESH) {
 			Arrays.fill(a, 0);
 		}
 
 		for (int i = 0; i < XMAX; i += MOVE) {
 			Line line = new Line(i, 0, i, YMAX);
+			line.setStroke(Color.web("#33e1ed"));
 			group.getChildren().addAll(line);
 		}
 
 		for (int i = 0; i <= YMAX; i += MOVE) {
 			Line line = new Line(0, i, XMAX, i);
+			line.setStroke(Color.web("#33e1ed"));
 			group.getChildren().addAll(line);
 		}
 
 		Line line = new Line(XMAX, 0, XMAX, YMAX);
-
-		Text scoretext = new Text("Score: ");
-
-		scoretext.setStyle("-fx-font: 20 arial;");
+		group.setStyle("-fx-background-color: #2d2d44;");
+		scoretext.setStyle("-fx-font: 20 arial; -fx-fill: white;");
 		scoretext.setY(50);
 		scoretext.setX(XMAX + 5);
 
-		Text level = new Text("Lines: ");
-		level.setStyle("-fx-font: 20 arial;");
-		level.setY(100);
+		reset.setStyle("-fx-font: 20 arial; -fx-fill: white; -fx-background-color: #33e1ed;");
+		reset.setLayoutX(XMAX + 5);
+		reset.setLayoutY(YMAX - 50);
+
+		Highscoretext.setStyle("-fx-font: 20 arial; -fx-fill: white;");
+		Highscoretext.setY(100);
+		Highscoretext.setX(XMAX + 5);
+
+		level.setStyle("-fx-font: 20 arial; -fx-fill: white;");
+		level.setY(150);
 		level.setX(XMAX + 5);
 		level.setFill(Color.GREEN);
 
-		group.getChildren().addAll(scoretext, line, level);
+		group.getChildren().addAll(scoretext, line, level, Highscoretext, reset);
 
 		FormFigure a = nextObj;
 		group.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -80,11 +104,14 @@ public class TetrisGame extends Application {
 		object = a;
 		nextObj = Controller.makeRect();
 
+		group.getChildren().clear();
+
+		resetGame();
+
 		stage.setScene(scene);
 		stage.setTitle("T E T R I S");
 		stage.show();
-
-		Timer fall = new Timer();
+		fall = new Timer();
 		TimerTask task = new TimerTask() {
 
 			@Override
@@ -110,11 +137,22 @@ public class TetrisGame extends Application {
 
 						if (top == 15) {
 							System.exit(0);
-						}   
+						}
 						if (game) {
 							MoveDown(object);
 							scoretext.setText("Score: " + score);
-							level.setText("lines: " + linesNo);
+							level.setText("Lines: " + linesNo);
+							if (score > highScore) {
+								highScore = score;
+								Highscoretext.setText("High Score: " + highScore);
+							}
+						} else {
+							resetGame();
+							if (highScore > DatabaseConnection.getHighScore("tetris",
+									DatabaseConnection.currentEmail)) {
+								DatabaseConnection.changeScore(DatabaseConnection.currentEmail, highScore, "tetris");
+							}
+
 						}
 					}
 
@@ -124,13 +162,20 @@ public class TetrisGame extends Application {
 		};
 		fall.schedule(task, 0, 300);
 		stage.setOnCloseRequest(event -> {
-			group.getChildren().clear();
-			top = 0;
-			score = 0;
-			linesNo = 0;
-			System.out.println("close window");
+			if (fall != null) {
+				fall.cancel();
+				fall.purge(); 
+			}
+			Platform.exit();
+
+		});
+		reset.setOnAction(event -> {
+			resetGame();
 		});
 	}
+
+	private long lastManualDropTime = 0;
+	private static final long MANUAL_DROP_DELAY = 50;
 
 	private void moveOnKeyPress(FormFigure form) {
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -148,8 +193,13 @@ public class TetrisGame extends Application {
 						Controller.MoveRight(form);
 						break;
 					case DOWN:
-						MoveDown(form);
-						score++;
+						long currentTime = System.currentTimeMillis();
+						if (currentTime - lastManualDropTime > MANUAL_DROP_DELAY) {
+							lastManualDropTime = currentTime;
+							MoveDown(form);
+							score++;
+							scoretext.setText("Score: " + score);
+						}
 						break;
 
 					default:
@@ -158,6 +208,7 @@ public class TetrisGame extends Application {
 			}
 
 		});
+
 	}
 
 	public static void MoveTurn(FormFigure form) {
@@ -524,7 +575,6 @@ public class TetrisGame extends Application {
 		ArrayList<Node> newrects = new ArrayList<>();
 		int full = 0;
 
-		// Поиск заполненных линий
 		for (int i = 0; i < MESH[0].length; i++) {
 			for (int j = 0; j < MESH.length; j++) {
 				if (MESH[j][i] == 1) {
@@ -532,13 +582,12 @@ public class TetrisGame extends Application {
 				}
 			}
 			if (full == MESH.length) {
-				lines.add(i); // Запоминаем индексы полных строк
+				lines.add(i); 
 			}
 			full = 0;
 		}
 
 		if (!lines.isEmpty()) {
-			// Удаление заполненных линий
 			for (int line : lines) {
 				List<Node> toRemove = new ArrayList<>();
 				for (Node node : pane.getChildren()) {
@@ -555,25 +604,22 @@ public class TetrisGame extends Application {
 				pane.getChildren().removeAll(toRemove);
 			}
 
-			// Перемещение оставшихся узлов вниз
 			for (Node node : newrects) {
 				if (node instanceof Rectangle) {
 					Rectangle rect = (Rectangle) node;
 					int originalY = (int) rect.getY() / SIZE;
 
-					// Считаем количество удалённых строк ниже текущей
 					long rowsBelow = lines.stream().filter(line -> originalY < line).count();
 
 					if (rowsBelow > 0) {
 						int oldX = (int) rect.getX() / SIZE;
 						int oldY = (int) rect.getY() / SIZE;
-						MESH[oldX][oldY] = 0; // Обнуляем старую позицию в MESH
-						rect.setY(rect.getY() + rowsBelow * SIZE); // Сдвигаем вниз
+						MESH[oldX][oldY] = 0; 
+						rect.setY(rect.getY() + rowsBelow * SIZE);
 					}
 				}
 			}
 
-			// Обновление массива MESH
 			for (Node node : pane.getChildren()) {
 				if (node instanceof Rectangle) {
 					Rectangle rect = (Rectangle) node;
@@ -679,4 +725,62 @@ public class TetrisGame extends Application {
 			return false;
 		}
 	}
+
+	public void resetGame() {
+		reset.setFocusTraversable(false);
+
+		group.getChildren().clear();
+
+		for (int[] row : MESH) {
+			Arrays.fill(row, 0);
+		}
+
+		score = 0;
+		linesNo = 0;
+		top = 0;
+		game = true;
+
+		object = Controller.makeRect();
+		nextObj = Controller.makeRect();
+
+		for (int i = 0; i <= XMAX; i += MOVE) {
+			Line line = new Line(i, 0, i, YMAX);
+			line.setStroke(Color.web("#33e1ed"));
+			group.getChildren().add(line);
+		}
+		for (int i = 0; i <= YMAX; i += MOVE) {
+			Line line = new Line(0, i, XMAX, i);
+			line.setStroke(Color.web("#33e1ed"));
+			group.getChildren().add(line);
+		}
+
+
+		scoretext.setText("Score: 0");
+		level.setText("Lines: 0");
+		Highscoretext
+				.setText("High Score: " + highScore);
+		reset.setLayoutX(XMAX + 5);
+		reset.setLayoutY(YMAX - 50);
+		group.getChildren().addAll(scoretext, level, Highscoretext, reset);
+
+		group.getChildren().addAll(object.a, object.b, object.c, object.d);
+
+		moveOnKeyPress(object);
+
+	}
+
+	private void stopTimer() {
+		if (fall != null) {
+			fall.cancel();
+			fall.purge();
+			fall = null;
+		}
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		stopTimer(); 
+	}
+
 }
